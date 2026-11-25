@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe Game</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #1e293b;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 { margin-bottom: 10px; }
+    .status {
+      font-size: 20px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 8px;
+    }
+    .cell {
+      background-color: #334155;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+    .cell:hover { background-color: #475569; }
+    .cell.x { color: #f43f5e; }
+    .cell.o { color: #38bdf8; }
+    .cell.win { background-color: #065f46; }
+    button {
+      margin-top: 25px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #38bdf8;
+      color: #0f172a;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #7dd3fc; }
+  </style>
+</head>
+<body>
+
+  <h1>Tic-Tac-Toe</h1>
+  <div class="status" id="status">Player X's Turn</div>
+  
+  <div class="board" id="board">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+  </div>
+
+  <button onclick="resetGame()">Reset Game</button>
+
+<script>
+  const cells = document.querySelectorAll('.cell');
+  const statusText = document.getElementById('status');
+  
+  let currentPlayer = 'X';
+  let boardState = ['', '', '', '', '', '', '', '', ''];
+  let gameActive = true;
+
+  const winConditions = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+    [0, 4, 8], [2, 4, 6]             // Diagonals
+  ];
+
+  cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+
+  function handleCellClick(e) {
+    const index = e.target.getAttribute('data-index');
+
+    if (boardState[index] !== '' || !gameActive) return;
+
+    boardState[index] = currentPlayer;
+    e.target.textContent = currentPlayer;
+    e.target.classList.add(currentPlayer.toLowerCase());
+
+    checkResult();
+  }
+
+  function checkResult() {
+    let winningCombo = null;
+
+    for (let condition of winConditions) {
+      const [a, b, c] = condition;
+      if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+        winningCombo = condition;
+        break;
+      }
+    }
+
+    if (winningCombo) {
+      statusText.textContent = `Player ${currentPlayer} Wins!`;
+      winningCombo.forEach(index => cells[index].classList.add('win'));
+      gameActive = false;
+      return;
+    }
+
+    if (!boardState.includes('')) {
+      statusText.textContent = "It's a Draw!";
+      gameActive = false;
+      return;
+    }
+
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    statusText.textContent = `Player ${currentPlayer}'s Turn`;
+  }
+
+  function resetGame() {
+    currentPlayer = 'X';
+    boardState = ['', '', '', '', '', '', '', '', ''];
+    gameActive = true;
+    statusText.textContent = "Player X's Turn";
+    cells.forEach(cell => {
+      cell.textContent = '';
+      cell.className = 'cell';
+    });
+  }
+</script>
+
+</body>
+</html>
